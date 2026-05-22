@@ -186,13 +186,13 @@ h1{
   <div class="top">
     <div>
       <h1>Purification de Taq-His8</h1>
-      <p class="sub">Choisissez <strong>une stratégie principale</strong> pour purifier ou enrichir la protéine à partir d’un lysat bactérien.</p>
+      <p class="sub">Choisissez <strong>la méthode principale</strong> pour purifier Taq-His8 à partir d’un lysat bactérien.</p>
     </div>
     <div class="timer" aria-live="polite"><b id="time">15</b><span>secondes</span></div>
   </div>
 
   <section id="start" class="panel">
-    <p class="instruction">Appuyez sur <strong>GO</strong>. Vous aurez <strong>15 secondes</strong> pour choisir la méthode qui vous paraît la plus pertinente. Un seul choix est possible.</p>
+    <p class="instruction">Appuyez sur <strong>GO</strong>. Vous aurez <strong>15 secondes</strong> pour choisir la méthode principale de purification. Un seul choix est possible.</p>
     <div class="goBox"><button id="go" type="button">GO</button></div>
   </section>
 
@@ -204,20 +204,20 @@ h1{
     <span>Discuter : purification ou contrôle ?</span>
   </div>
 
-  <p class="footer">Aucune correction automatique : le choix sert de point de départ à la discussion.</p>
+  <p class="footer">Aucune correction automatique : le choix sert à discuter purification, enrichissement et contrôle.</p>
 </main>
 
 <script>
 const DURATION = 15;
 const choices = [
-  ['SEC', 'séparation sur colonne selon la taille'],
-  ['Ni-NTA / IMAC', 'affinité Etiquette His8 - nickel'],
-  ['Échange d’ions', 'charge nette et pH'],
-  ['Migration selon le pI', 'point isoélectrique'],
-  ['SDS-PAGE', 'migration sur gel par la masse apparente'],
-  ['Chauffage 80 °C', 'thermostabilité'],
-  ['Précipitation au sulfate d’ammonium', 'solubilité des protéines'],
-  ['Dialyse / dessalage', 'changement de tampon et sels']
+  ['Centrifugation du lysat', 'retirer les débris insolubles'],
+  ['Échange d’ions', 'séparer selon la charge nette'],
+  ['SDS-PAGE', 'analyser le profil de protéines'],
+  ['Chauffage à 80 °C', 'enrichir grâce à la thermostabilité de Taq'],
+  ['SEC', 'séparer selon la taille'],
+  ['Western blot anti-His', 'identifier une protéine His8'],
+  ['Ni-NTA / IMAC', 'purifier grâce à l’étiquette His8'],
+  ['Électrofocalisation', 'séparer selon le point isoélectrique']
 ];
 
 let running = false;
