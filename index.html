@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Purification Taq-His8</title>
+<style>
+:root{--bg:#f7f5f0;--ink:#111;--muted:#5f5a50;--line:#d7d0c3;--sel:#111;--white:#fff;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100svh;}
+.wrap{width:min(100%,520px);margin:0 auto;padding:22px 18px 28px;}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:16px;}
+h1{font-size:25px;line-height:1.05;margin:0 0 8px;font-weight:800;letter-spacing:-.02em;}
+.sub{font-size:15px;line-height:1.35;color:var(--muted);margin:0;}
+.timer{min-width:92px;text-align:center;border:2px solid var(--ink);border-radius:16px;padding:8px 10px;background:#fff;font-weight:900;}
+.timer b{display:block;font-size:31px;line-height:1;}
+.timer span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
+.panel{background:#fff;border:1px solid var(--line);border-radius:24px;padding:16px;margin:14px 0;box-shadow:0 8px 24px rgba(0,0,0,.06);}
+.instruction{font-size:17px;line-height:1.35;margin:0;color:var(--ink);}
+.goBox{display:grid;place-items:center;padding:26px 0 22px;}
+#go{width:178px;height:178px;border-radius:50%;border:0;background:#000;color:#fff;font-size:52px;font-weight:1000;letter-spacing:.03em;box-shadow:0 10px 0 rgba(0,0,0,.18);touch-action:manipulation;}
+#go:active{transform:translateY(3px);box-shadow:0 7px 0 rgba(0,0,0,.18);}
+#status{font-size:15px;color:var(--muted);text-align:center;margin:0 0 12px;min-height:21px;}
+.grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.choice{width:100%;text-align:left;border:2px solid var(--line);border-radius:18px;background:#fff;color:#111;padding:14px 14px;font-size:17px;line-height:1.2;font-weight:700;touch-action:manipulation;}
+.choice small{display:block;font-size:13px;line-height:1.25;font-weight:600;color:var(--muted);margin-top:3px;}
+.choice.selected{background:#111;color:#fff;border-color:#111;}
+.choice.selected small{color:#ddd;}
+.choice:disabled{opacity:1;}
+.hidden{display:none;}
+.footer{font-size:12px;color:var(--muted);text-align:center;margin-top:16px;}
+@media (max-width:360px){h1{font-size:22px}.choice{font-size:16px;padding:12px}#go{width:156px;height:156px;font-size:46px}.timer b{font-size:27px}.timer{min-width:82px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top">
+    <div>
+      <h1>Purification de Taq-His8</h1>
+      <p class="sub">Sélectionnez toutes les étapes que vous utiliseriez pour enrichir ou purifier la protéine.</p>
+    </div>
+    <div class="timer" aria-live="polite"><b id="time">15</b><span>secondes</span></div>
+  </div>
+
+  <section id="start" class="panel">
+    <p class="instruction">Appuyez sur <strong>GO</strong>. Vous aurez <strong>15 secondes</strong>. Après le chrono, les choix restent affichés mais ne sont plus modifiables.</p>
+    <div class="goBox"><button id="go" type="button">GO</button></div>
+  </section>
+
+  <p id="status">En attente du départ.</p>
+  <section id="quiz" class="grid hidden" aria-label="Choix des étapes"></section>
+  <p class="footer">Aucune correction automatique : gardez vos choix pour la discussion.</p>
+</main>
+<script>
+const DURATION=15;
+const choices=[
+ ['Lyse bactérienne','ouvrir les cellules'],
+ ['Centrifugation du lysat','retirer les débris cellulaires'],
+ ['Chauffage contrôlé','exploiter la thermostabilité de Taq'],
+ ['Centrifugation après chauffage','retirer les protéines précipitées'],
+ ['Chromatographie IMAC nickel/His8','capturer la protéine étiquetée'],
+ ['Lavage de colonne','retirer les protéines faiblement liées'],
+ ['Élution de Taq-His8','récupérer la protéine enrichie'],
+ ['Changement de tampon','rendre l’enzyme utilisable'],
+ ['SDS-PAGE','contrôle du profil de protéines'],
+ ['Western blot anti-His','contrôle de l’identité'],
+ ['Test d’activité','contrôle de la fonction'],
+ ['Exclusion stérique','séparer selon la taille']
+];
+let running=false,locked=false,remaining=DURATION,tick=null;
+const q=document.getElementById('quiz'),go=document.getElementById('go'),start=document.getElementById('start'),time=document.getElementById('time'),status=document.getElementById('status');
+function render(){q.innerHTML='';choices.forEach(([a,b])=>{const btn=document.createElement('button');btn.className='choice';btn.type='button';btn.innerHTML=a+'<small>'+b+'</small>';btn.onclick=()=>{if(running&&!locked)btn.classList.toggle('selected')};q.appendChild(btn);});}
+function lock(){locked=true;running=false;clearInterval(tick);status.textContent='Temps écoulé : réponses verrouillées.';document.querySelectorAll('.choice').forEach(b=>b.disabled=true);}
+function startQuiz(){if(running)return;render();q.classList.remove('hidden');start.classList.add('hidden');status.textContent='Sélection en cours.';remaining=DURATION;time.textContent=remaining;running=true;locked=false;tick=setInterval(()=>{remaining--;time.textContent=remaining;if(remaining<=0)lock();},1000);}
+go.addEventListener('click',startQuiz);
+</script>
+</body>
+</html>
