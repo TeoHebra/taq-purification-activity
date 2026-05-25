@@ -186,25 +186,25 @@ h1{
   <div class="top">
     <div>
       <h1>Purification de Taq-His8</h1>
-      <p class="sub">Choisissez <strong>la méthode principale</strong> pour purifier Taq-His8 à partir d’un lysat bactérien.</p>
+      <p class="sub">Sélectionnez <strong>toutes les étapes possibles</strong> pour enrichir ou purifier Taq-His8 à partir d’un lysat bactérien.</p>
     </div>
     <div class="timer" aria-live="polite"><b id="time">15</b><span>secondes</span></div>
   </div>
 
   <section id="start" class="panel">
-    <p class="instruction">Appuyez sur <strong>GO</strong>. Vous aurez <strong>15 secondes</strong> pour choisir la méthode principale de purification. Un seul choix est possible.</p>
+    <p class="instruction">Appuyez sur <strong>GO</strong>. Vous aurez <strong>15 secondes</strong> pour sélectionner toutes les étapes que vous jugez possibles. Plusieurs choix sont possibles ; recliquez sur un choix pour l’annuler.</p>
     <div class="goBox"><button id="go" type="button">GO</button></div>
   </section>
 
   <p id="status">En attente du départ.</p>
-  <section id="quiz" class="grid hidden" aria-label="Choix de la stratégie principale"></section>
+  <section id="quiz" class="grid hidden" aria-label="Choix des étapes possibles de purification"></section>
 
   <div id="legend" class="legend hidden" aria-hidden="true">
     <span>Réfléchir : propriété exploitée</span>
     <span>Discuter : purification ou contrôle ?</span>
   </div>
 
-  <p class="footer">Aucune correction automatique : le choix sert à discuter purification, enrichissement et contrôle.</p>
+  <p class="footer">Aucune correction automatique : les choix servent à discuter purification, enrichissement et contrôle.</p>
 </main>
 
 <script>
@@ -224,7 +224,7 @@ let running = false;
 let locked = false;
 let remaining = DURATION;
 let tick = null;
-let selectedLabel = '';
+let selectedLabels = new Set();
 
 const q = document.getElementById('quiz');
 const go = document.getElementById('go');
@@ -233,19 +233,37 @@ const time = document.getElementById('time');
 const status = document.getElementById('status');
 const legend = document.getElementById('legend');
 
+function updateStatus(){
+  const count = selectedLabels.size;
+  if(count === 0){
+    status.textContent = 'Sélection en cours : aucun choix sélectionné.';
+  } else if(count === 1){
+    status.textContent = 'Sélection en cours : 1 choix sélectionné.';
+  } else {
+    status.textContent = 'Sélection en cours : ' + count + ' choix sélectionnés.';
+  }
+}
+
 function render(){
   q.innerHTML = '';
   choices.forEach(([method, basis]) => {
     const btn = document.createElement('button');
     btn.className = 'choice';
     btn.type = 'button';
+    btn.setAttribute('aria-pressed', 'false');
     btn.innerHTML = method + '<small>' + basis + '</small>';
     btn.onclick = () => {
       if(!running || locked) return;
-      document.querySelectorAll('.choice').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedLabel = method;
-      status.textContent = 'Choix sélectionné : ' + method;
+      if(selectedLabels.has(method)){
+        selectedLabels.delete(method);
+        btn.classList.remove('selected');
+        btn.setAttribute('aria-pressed', 'false');
+      } else {
+        selectedLabels.add(method);
+        btn.classList.add('selected');
+        btn.setAttribute('aria-pressed', 'true');
+      }
+      updateStatus();
     };
     q.appendChild(btn);
   });
@@ -255,9 +273,14 @@ function lock(){
   locked = true;
   running = false;
   clearInterval(tick);
-  status.textContent = selectedLabel
-    ? 'Temps écoulé : choix verrouillé — ' + selectedLabel + '.'
-    : 'Temps écoulé : aucun choix sélectionné.';
+  const count = selectedLabels.size;
+  if(count === 0){
+    status.textContent = 'Temps écoulé : aucun choix sélectionné.';
+  } else if(count === 1){
+    status.textContent = 'Temps écoulé : sélection verrouillée — 1 choix sélectionné.';
+  } else {
+    status.textContent = 'Temps écoulé : sélection verrouillée — ' + count + ' choix sélectionnés.';
+  }
   document.querySelectorAll('.choice').forEach(b => b.disabled = true);
 }
 
@@ -267,12 +290,12 @@ function startQuiz(){
   q.classList.remove('hidden');
   legend.classList.remove('hidden');
   start.classList.add('hidden');
-  status.textContent = 'Sélection en cours.';
   remaining = DURATION;
-  selectedLabel = '';
+  selectedLabels = new Set();
   time.textContent = remaining;
   running = true;
   locked = false;
+  updateStatus();
   tick = setInterval(() => {
     remaining--;
     time.textContent = remaining;
